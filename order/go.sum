@@ -7,10 +7,10 @@ github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiu
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.0.1-beta.2 h1:7NjCGvgVTLshTGcS15kA+z6ePYxOcSB6ys6ov1G4fIs=
-github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.0.1-beta.2/go.mod h1:TCNuhCq88b9UrgYIZeXjy/jMTHCPIOMYlkt7qtid67A=
 github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.1.0 h1:NylIG9VgTEfo+XDOaLwgo0YUFcHWo84DZwSeGo5RVgk=
 github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.1.0/go.mod h1:TCNuhCq88b9UrgYIZeXjy/jMTHCPIOMYlkt7qtid67A=
+github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment v0.2.1 h1:jkpzz9w+ahoFfDMYpKTEimw7Qrn9rY20fXwmSgKDYHM=
+github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment v0.2.1/go.mod h1:lS+mFIJBEZs0CF7T+zGCM0OS57hWy56dtF2JcugZEwc=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.1.5 h1:/o9tlHleP7gOFmsnYNz3RGnqzefHA47wQpKrrdTIwXQ=

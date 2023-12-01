@@ -28,7 +28,7 @@ func (a *Adapter) Run() {
 	var err error
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
 	if err != nil {
-		log.Fatal("failed to listen on port %d, error: %v", a.port, err)
+		log.Fatalf("failed to listen on port %d, error: %v", a.port, err)
 	}
 
 	grpcSrv := grpc.NewServer()
@@ -36,7 +36,9 @@ func (a *Adapter) Run() {
 	if config.GetEnv() == "development" {
 		reflection.Register(grpcSrv)
 	}
+	a.server = grpcSrv
 
+	log.Printf("starting payment service on port %d ...", a.port)
 	err = grpcSrv.Serve(listen)
 	if err != nil {
 		log.Fatalf("serve grpc on port: %d, %s", a.port, err)
