@@ -28,3 +28,8 @@ mock:
 .PHONY: test
 test:
 	cd order; go test --count=1 --race ./...
+	cd e2e; go test --count=1 -v --race ./...
+
+build-images:
+	cd order; docker build -t huypk2000/grpc-order-service:1.0.0 .
+	cd payment; docker build -t huypk2000/grpc-payment-service:1.0.0 .

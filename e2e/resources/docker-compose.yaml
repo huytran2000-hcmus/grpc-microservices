@@ -1,0 +1,50 @@
+version: "3.10"
+services:
+  mysql:
+    image: "mysql:8.0.35"
+    # container_name: db
+    environment:
+      # MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_ROOT_PASSWORD: "verysecretpass"
+    volumes:
+      - "../../init.sql:/docker-entrypoint-initdb.d/my-init.sql"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "mysql", "-uroot", "-pverysecretpass"]
+      start_period: 3s
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  payment:
+    build: ../../payment/
+    environment:
+      APPLICATION_PORT: 3001
+      ENV: "development"
+      DATA_SOURCE_URL: "payment_service:verysecretpass@tcp(mysql:3306)/payment_service?charset=utf8mb4&parseTime=True&loc=Local"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/bin/grpc_health_probe", "-addr=:3001"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+  order:
+    build: ../../order/
+    ports:
+      - "3000:3000"
+    environment:
+      APPLICATION_PORT: 3000
+      ENV: "development"
+      DATA_SOURCE_URL: "order_service:verysecretpass@tcp(mysql:3306)/order_service?charset=utf8mb4&parseTime=True&loc=Local"
+      PAYMENT_SERVICE_URL: "payment:3001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      payment:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/bin/grpc_health_probe", "-addr=:3000"]
+      start_period: 1s
+      interval: 3s
+      timeout: 3s
+      retries: 10

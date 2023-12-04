@@ -7,6 +7,8 @@ import (
 
 	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/huytran2000-hcmus/grpc-microservices/order/config"
@@ -32,6 +34,11 @@ func (a *Adapter) Run() {
 	}
 
 	grpcSrv := grpc.NewServer()
+
+	hsrv := health.NewServer()
+	hsrv.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	grpc_health_v1.RegisterHealthServer(grpcSrv, hsrv)
+
 	order.RegisterOrderServer(grpcSrv, a)
 	if config.GetEnv() == "development" {
 		reflection.Register(grpcSrv)

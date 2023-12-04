@@ -6,12 +6,13 @@ import (
 	"net"
 
 	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment"
-	"github.com/huytran2000-hcmus/grpc-microservices/payment/config"
-	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/ports"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	"google.golang.org/grpc"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/config"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/ports"
 )
 
 type Adapter struct {
@@ -33,17 +34,20 @@ func (a Adapter) Run() {
 		log.Fatalf("failed to listen on port %d, error: %v", a.port, err)
 	}
 
-	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-	)
-	a.server = grpcServer
-	payment.RegisterPaymentServer(grpcServer, a)
+	grpcSrv := grpc.NewServer()
+
+	hsrv := health.NewServer()
+	hsrv.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	grpc_health_v1.RegisterHealthServer(grpcSrv, hsrv)
+
+	a.server = grpcSrv
+	payment.RegisterPaymentServer(grpcSrv, a)
 	if config.GetEnv() == "development" {
-		reflection.Register(grpcServer)
+		reflection.Register(grpcSrv)
 	}
 
 	log.Printf("starting payment service on port %d ...", a.port)
-	if err := grpcServer.Serve(listen); err != nil {
+	if err := grpcSrv.Serve(listen); err != nil {
 		log.Fatalf("failed to serve grpc on port ")
 	}
 }

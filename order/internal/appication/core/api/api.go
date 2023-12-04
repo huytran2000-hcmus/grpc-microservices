@@ -1,9 +1,13 @@
 package api
 
 import (
+	"context"
+
 	"github.com/huytran2000-hcmus/grpc-microservices/order/internal/appication/core/domain"
 	"github.com/huytran2000-hcmus/grpc-microservices/order/internal/ports"
 )
+
+var _ ports.APIPort = (*Application)(nil)
 
 type Application struct {
 	db      ports.DBPort
@@ -28,4 +32,8 @@ func (a *Application) PlaceOrder(order domain.Order) (domain.Order, error) {
 	}
 
 	return order, nil
+}
+
+func (a Application) GetOrder(ctx context.Context, id int64) (domain.Order, error) {
+	return a.db.Get(id)
 }

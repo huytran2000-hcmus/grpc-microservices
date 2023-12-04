@@ -53,7 +53,7 @@ func (a Adapter) Save(ctx context.Context, payment *domain.Payment) error {
 func NewAdapter(dataSourceUrl string) (*Adapter, error) {
 	db, openErr := gorm.Open(mysql.Open(dataSourceUrl), &gorm.Config{})
 	if openErr != nil {
-		return nil, fmt.Errorf("db connection error: %v", openErr)
+		return nil, fmt.Errorf("db connection error %q: %w", dataSourceUrl, openErr)
 	}
 
 	err := db.AutoMigrate(&Payment{})

@@ -32,9 +32,9 @@ type Adapter struct {
 }
 
 func NewAdapter(connStr string) (*Adapter, error) {
-	db, err := gorm.Open(mysql.Open(connStr))
+	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("open db connection: %w", err)
+		return nil, fmt.Errorf("open db connection %s: %w", connStr, err)
 	}
 
 	err = db.AutoMigrate(&Order{}, &OrderItem{})
@@ -49,7 +49,7 @@ func NewAdapter(connStr string) (*Adapter, error) {
 
 func (a *Adapter) Get(id int64) (domain.Order, error) {
 	var orderEntity Order
-	err := a.db.First(&orderEntity, id).Error
+	err := a.db.Preload("OrderItems").First(&orderEntity, id).Error
 	if err != nil {
 		return domain.Order{}, err
 	}
