@@ -21,7 +21,7 @@ func (_m *MockDBPort) EXPECT() *MockDBPort_Expecter {
 }
 
 // Get provides a mock function with given fields: id
-func (_m *MockDBPort) Get(id string) (domain.Order, error) {
+func (_m *MockDBPort) Get(id int64) (domain.Order, error) {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
@@ -30,16 +30,16 @@ func (_m *MockDBPort) Get(id string) (domain.Order, error) {
 
 	var r0 domain.Order
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (domain.Order, error)); ok {
+	if rf, ok := ret.Get(0).(func(int64) (domain.Order, error)); ok {
 		return rf(id)
 	}
-	if rf, ok := ret.Get(0).(func(string) domain.Order); ok {
+	if rf, ok := ret.Get(0).(func(int64) domain.Order); ok {
 		r0 = rf(id)
 	} else {
 		r0 = ret.Get(0).(domain.Order)
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)
@@ -54,14 +54,14 @@ type MockDBPort_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - id string
+//   - id int64
 func (_e *MockDBPort_Expecter) Get(id interface{}) *MockDBPort_Get_Call {
 	return &MockDBPort_Get_Call{Call: _e.mock.On("Get", id)}
 }
 
-func (_c *MockDBPort_Get_Call) Run(run func(id string)) *MockDBPort_Get_Call {
+func (_c *MockDBPort_Get_Call) Run(run func(id int64)) *MockDBPort_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(int64))
 	})
 	return _c
 }
@@ -71,7 +71,7 @@ func (_c *MockDBPort_Get_Call) Return(_a0 domain.Order, _a1 error) *MockDBPort_G
 	return _c
 }
 
-func (_c *MockDBPort_Get_Call) RunAndReturn(run func(string) (domain.Order, error)) *MockDBPort_Get_Call {
+func (_c *MockDBPort_Get_Call) RunAndReturn(run func(int64) (domain.Order, error)) *MockDBPort_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -47,7 +47,7 @@ func NewAdapter(connStr string) (*Adapter, error) {
 	}, nil
 }
 
-func (a *Adapter) Get(id string) (domain.Order, error) {
+func (a *Adapter) Get(id int64) (domain.Order, error) {
 	var orderEntity Order
 	err := a.db.First(&orderEntity, id).Error
 	if err != nil {
