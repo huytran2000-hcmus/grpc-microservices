@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/huseyinbabal/microservices/payment/internal/application/core/domain"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/application/core/domain"
 )
 
 type Payment struct {

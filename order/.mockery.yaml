@@ -1,0 +1,9 @@
+dir: "mocks/{{.PackageName}}"
+outpkg: "{{.PackageName}}"
+filename: "mock_{{ .InterfaceName | snakecase }}.go"
+mockname: "Mock{{.InterfaceName}}"
+with-expecter: true
+packages:
+  github.com/huytran2000-hcmus/grpc-microservices/order/internal/ports:
+    config:
+      all: true # generate all interface

@@ -20,3 +20,11 @@ payment:
 	APPLICATION_PORT=3001 \
 	ENV=development \
 	go run cmd/main.go
+
+.PHONY: mock
+mock:
+	cd order; mockery
+
+.PHONY: test
+test:
+	cd order; go test --count=1 --race ./...

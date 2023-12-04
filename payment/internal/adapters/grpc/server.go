@@ -2,13 +2,14 @@ package grpc
 
 import (
 	"fmt"
-	"github.com/huseyinbabal/microservices-proto/golang/payment"
-	"github.com/huseyinbabal/microservices/payment/config"
-	"github.com/huseyinbabal/microservices/payment/internal/ports"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+
+	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/config"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/ports"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"google.golang.org/grpc/reflection"
 
 	"google.golang.org/grpc"
 )

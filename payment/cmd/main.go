@@ -3,10 +3,10 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/huseyinbabal/microservices/payment/config"
-	"github.com/huseyinbabal/microservices/payment/internal/adapters/db"
-	"github.com/huseyinbabal/microservices/payment/internal/adapters/grpc"
-	"github.com/huseyinbabal/microservices/payment/internal/application/core/api"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/config"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/adapters/db"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/adapters/grpc"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/application/core/api"
 )
 
 func main() {

@@ -2,7 +2,8 @@ package ports
 
 import (
 	"context"
-	"github.com/huseyinbabal/microservices/payment/internal/application/core/domain"
+
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/application/core/domain"
 )
 
 type APIPort interface {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/huseyinbabal/microservices-proto/golang/payment"
+	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/huseyinbabal/microservices/payment/internal/application/core/domain"
+	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/application/core/domain"
 )
 
 func (a Adapter) Create(ctx context.Context, request *payment.CreatePaymentRequest) (*payment.CreatePaymentResponse, error) {
