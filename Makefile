@@ -33,3 +33,6 @@ test:
 build-images:
 	cd order; docker build -t huypk2000/grpc-order-service:1.0.0 .
 	cd payment; docker build -t huypk2000/grpc-payment-service:1.0.0 .
+
+test-container:
+	kubectl run curl --image=radial/busyboxplus:curl -i --tty --rm

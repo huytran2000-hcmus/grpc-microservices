@@ -1,0 +1,9 @@
+dependencies:
+- name: mysql
+  repository: https://charts.bitnami.com/bitnami
+  version: 9.14.4
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.13.2
+digest: sha256:c1af5149611698ec816c424e70e942b05cf7a2dc405a213983aa0c08129de379
+generated: "2023-12-09T01:48:48.315632938+07:00"

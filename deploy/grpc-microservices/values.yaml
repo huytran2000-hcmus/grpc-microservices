@@ -1,0 +1,33 @@
+replicaCount: 
+  order: 1
+  payment: 1
+
+image:
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+service:
+  orderPort: "8080"
+  paymentPort: "8081"
+
+mysql:
+  auth:
+    rootPassword: "verysecretpassword"
+      # initdbScripts:
+      #   init.sql: |
+      #     CREATE DATABASE order_service;
+      #     CREATE DATABASE payment_service;
+
+      #     CREATE USER 'payment_service'@'%' IDENTIFIED BY 'verysecretpass';
+      #     CREATE USER 'order_service'@'%' IDENTIFIED BY 'verysecretpass';
+
+      #     GRANT ALL PRIVILEGES ON order_service.* TO 'order_service'@'%';
+      #     GRANT ALL PRIVILEGES ON payment_service.* TO 'payment_service'@'%';
+  initdbScriptsConfigMap: mysql-initdb-config
+
+tags:
+  tls: true
+
+cert-manager:
+  enabled: true
+  installCRDs: true
