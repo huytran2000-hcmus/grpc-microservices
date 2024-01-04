@@ -3,9 +3,14 @@ module github.com/huytran2000-hcmus/grpc-microservices/order
 go 1.21.3
 
 require (
+	github.com/docker/go-connections v0.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.1.0
 	github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment v0.2.1
 	github.com/stretchr/testify v1.8.4
+	github.com/testcontainers/testcontainers-go v0.26.0
+	github.com/testcontainers/testcontainers-go/modules/mysql v0.26.0
+	go.uber.org/zap v1.26.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231127180814-3a041ad873d4
 	google.golang.org/grpc v1.59.0
 	gorm.io/driver/mysql v1.5.2
@@ -24,7 +29,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/docker v24.0.6+incompatible // indirect
-	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -50,11 +54,10 @@ require (
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/testcontainers/testcontainers-go v0.26.0 // indirect
-	github.com/testcontainers/testcontainers-go/modules/mysql v0.26.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea // indirect
 	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/net v0.19.0 // indirect

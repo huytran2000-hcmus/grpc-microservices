@@ -63,9 +63,7 @@ spec:
         {{- include "grpc-microservices.labels" . | nindent 8}}
     spec:
       initContainers:
-      - name: mysql-wait
-        image: busybox:1.28
-        command: ['sh', '-c', 'until nslookup {{ .Release.Name }}-mysql; do echo waiting for mysql; sleep 2; done']
+        {{- include "initContainer.mysqlWait" . | nindent 6 }}
       containers:
       - name: order
         image: "huypk2000/grpc-order-service:{{ .Values.image.tag }}"

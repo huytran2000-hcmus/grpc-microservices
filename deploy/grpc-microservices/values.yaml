@@ -13,16 +13,6 @@ service:
 mysql:
   auth:
     rootPassword: "verysecretpassword"
-      # initdbScripts:
-      #   init.sql: |
-      #     CREATE DATABASE order_service;
-      #     CREATE DATABASE payment_service;
-
-      #     CREATE USER 'payment_service'@'%' IDENTIFIED BY 'verysecretpass';
-      #     CREATE USER 'order_service'@'%' IDENTIFIED BY 'verysecretpass';
-
-      #     GRANT ALL PRIVILEGES ON order_service.* TO 'order_service'@'%';
-      #     GRANT ALL PRIVILEGES ON payment_service.* TO 'payment_service'@'%';
   initdbScriptsConfigMap: mysql-initdb-config
 
 tags:
@@ -31,3 +21,35 @@ tags:
 cert-manager:
   enabled: true
   installCRDs: true
+
+fluent-bit:
+  config:
+    inputs: |
+      [INPUT]
+          Name tail
+          Path /var/log/containers/*.log
+          multiline.parser docker, cri
+          Tag kube.*
+          Mem_Buf_Limit 5MB
+          Skip_Long_Lines On
+    filters: |
+      [FILTER]
+          Name kubernetes
+          Match kube.*
+          Merge_Log On
+          Keep_Log Off
+          K8S-Logging.Parser On
+          K8S-Logging.Exclude On
+    outputs: |
+      [OUTPUT]
+          Name opensearch
+          Match kube.*
+          Host opensearch-cluster-master
+          Logstash_Format On
+          Logstash_Prefix kubernetes_nodes_logs
+          Suppress_Type_Name On
+          Retry_Limit 5
+          HTTP_User admin
+          HTTP_Passwd admin
+          tls On
+          tls.verify Off

@@ -35,3 +35,12 @@ dependencies:
     condition: cert-manager.enabled
     tags:
       - tls
+  - name: fluent-bit
+    version: "^0.42.0"
+    repository: https://fluent.github.io/helm-charts
+  - name: opensearch
+    version: "~2.17.2"
+    repository: https://opensearch-project.github.io/helm-charts
+  - name: opensearch-dashboards
+    version: "~2.15.1"
+    repository: https://opensearch-project.github.io/helm-charts

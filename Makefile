@@ -31,8 +31,23 @@ test:
 	cd e2e; go test --count=1 -v --race ./...
 
 build-images:
+	eval $(minikube docker-env)
 	cd order; docker build -t huypk2000/grpc-order-service:1.0.0 .
 	cd payment; docker build -t huypk2000/grpc-payment-service:1.0.0 .
 
 test-container:
 	kubectl run curl --image=radial/busyboxplus:curl -i --tty --rm
+
+helm-install:
+	helm install grpc-microservices deploy/grpc-microservices/ 
+	minikube tunnel
+
+helm-uninstall:
+	helm uninstall grpc-microservices
+
+helm-upgrade:
+	helm upgrade grpc-microservices deploy/grpc-microservices/
+
+grpcurl-test-request:
+	grpcurl --insecure --import-path ../grpc-microservices-proto/order --proto order.proto -d '{"user_id": 123, "order_items": [{"product_code": "prod","quantity": 4, "unit_price": 12}]}' ingress.local:443  Order/Create 
+
