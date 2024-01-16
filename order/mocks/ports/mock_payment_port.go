@@ -3,6 +3,8 @@
 package ports
 
 import (
+	context "context"
+
 	domain "github.com/huytran2000-hcmus/grpc-microservices/order/internal/appication/core/domain"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -20,17 +22,17 @@ func (_m *MockPaymentPort) EXPECT() *MockPaymentPort_Expecter {
 	return &MockPaymentPort_Expecter{mock: &_m.Mock}
 }
 
-// Charge provides a mock function with given fields: _a0
-func (_m *MockPaymentPort) Charge(_a0 *domain.Order) error {
-	ret := _m.Called(_a0)
+// Charge provides a mock function with given fields: _a0, _a1
+func (_m *MockPaymentPort) Charge(_a0 context.Context, _a1 *domain.Order) error {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Charge")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*domain.Order) error); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, *domain.Order) error); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -44,14 +46,15 @@ type MockPaymentPort_Charge_Call struct {
 }
 
 // Charge is a helper method to define mock.On call
-//   - _a0 *domain.Order
-func (_e *MockPaymentPort_Expecter) Charge(_a0 interface{}) *MockPaymentPort_Charge_Call {
-	return &MockPaymentPort_Charge_Call{Call: _e.mock.On("Charge", _a0)}
+//   - _a0 context.Context
+//   - _a1 *domain.Order
+func (_e *MockPaymentPort_Expecter) Charge(_a0 interface{}, _a1 interface{}) *MockPaymentPort_Charge_Call {
+	return &MockPaymentPort_Charge_Call{Call: _e.mock.On("Charge", _a0, _a1)}
 }
 
-func (_c *MockPaymentPort_Charge_Call) Run(run func(_a0 *domain.Order)) *MockPaymentPort_Charge_Call {
+func (_c *MockPaymentPort_Charge_Call) Run(run func(_a0 context.Context, _a1 *domain.Order)) *MockPaymentPort_Charge_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*domain.Order))
+		run(args[0].(context.Context), args[1].(*domain.Order))
 	})
 	return _c
 }
@@ -61,7 +64,7 @@ func (_c *MockPaymentPort_Charge_Call) Return(_a0 error) *MockPaymentPort_Charge
 	return _c
 }
 
-func (_c *MockPaymentPort_Charge_Call) RunAndReturn(run func(*domain.Order) error) *MockPaymentPort_Charge_Call {
+func (_c *MockPaymentPort_Charge_Call) RunAndReturn(run func(context.Context, *domain.Order) error) *MockPaymentPort_Charge_Call {
 	_c.Call.Return(run)
 	return _c
 }

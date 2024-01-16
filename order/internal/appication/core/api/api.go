@@ -21,12 +21,12 @@ func NewApplication(db ports.DBPort, payment ports.PaymentPort) *Application {
 	}
 }
 
-func (a *Application) PlaceOrder(order domain.Order) (domain.Order, error) {
-	err := a.db.Save(&order)
+func (a *Application) PlaceOrder(ctx context.Context, order domain.Order) (domain.Order, error) {
+	err := a.db.Save(ctx, &order)
 	if err != nil {
 		return domain.Order{}, err
 	}
-	err = a.payment.Charge(&order)
+	err = a.payment.Charge(ctx, &order)
 	if err != nil {
 		return domain.Order{}, err
 	}
@@ -35,5 +35,5 @@ func (a *Application) PlaceOrder(order domain.Order) (domain.Order, error) {
 }
 
 func (a Application) GetOrder(ctx context.Context, id int64) (domain.Order, error) {
-	return a.db.Get(id)
+	return a.db.Get(ctx, id)
 }

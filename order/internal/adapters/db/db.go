@@ -1,8 +1,10 @@
 package db
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -37,6 +39,11 @@ func NewAdapter(connStr string) (*Adapter, error) {
 		return nil, fmt.Errorf("open db connection %s: %w", connStr, err)
 	}
 
+	err = db.Use(otelgorm.NewPlugin(otelgorm.WithDBName("order")))
+	if err != nil {
+		return nil, fmt.Errorf("use opentelemetry plugin: %w", err)
+	}
+
 	err = db.AutoMigrate(&Order{}, &OrderItem{})
 	if err != nil {
 		return nil, fmt.Errorf("migrate table: %w", err)
@@ -47,11 +54,11 @@ func NewAdapter(connStr string) (*Adapter, error) {
 	}, nil
 }
 
-func (a *Adapter) Get(id int64) (domain.Order, error) {
+func (a *Adapter) Get(ctx context.Context, id int64) (domain.Order, error) {
 	var orderEntity Order
-	err := a.db.Preload("OrderItems").First(&orderEntity, id).Error
+	err := a.db.WithContext(ctx).Preload("OrderItems").First(&orderEntity, id).Error
 	if err != nil {
-		return domain.Order{}, err
+		return domain.Order{}, fmt.Errorf("get order: %w", err)
 	}
 	var orderItems []domain.OrderItem
 	for _, item := range orderEntity.OrderItems {
@@ -69,7 +76,7 @@ func (a *Adapter) Get(id int64) (domain.Order, error) {
 	return order, nil
 }
 
-func (a *Adapter) Save(order *domain.Order) error {
+func (a *Adapter) Save(ctx context.Context, order *domain.Order) error {
 	var orderItemEntities []OrderItem
 	for _, item := range order.OrderItems {
 		orderItemEntities = append(orderItemEntities, OrderItem{
@@ -85,7 +92,7 @@ func (a *Adapter) Save(order *domain.Order) error {
 		OrderItems: orderItemEntities,
 	}
 
-	err := a.db.Create(&orderEntity).Error
+	err := a.db.WithContext(ctx).Create(&orderEntity).Error
 	if err != nil {
 		return fmt.Errorf("insert db order: %w", err)
 	}

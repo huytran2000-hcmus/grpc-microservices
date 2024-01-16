@@ -29,7 +29,8 @@ func TestDB(t *testing.T) {
 func (s *OrderDatabaseTestSuite) TestSaveOrder() {
 	adapter, err := NewAdapter(s.DataSourceURL)
 	s.Require().NoError(err)
-	err = adapter.Save(&domain.Order{})
+	ctx := context.Background()
+	err = adapter.Save(ctx, &domain.Order{})
 	s.Require().NoError(err)
 }
 
@@ -44,10 +45,12 @@ func (s *OrderDatabaseTestSuite) TestGetOrder() {
 			UnitPrice:   1.32,
 		},
 	})
-	err = adapter.Save(&order)
+
+	ctx := context.Background()
+	err = adapter.Save(ctx, &order)
 	s.Require().NoError(err)
 
-	ord, err := adapter.Get(order.ID)
+	ord, err := adapter.Get(ctx, order.ID)
 	s.Require().NoError(err)
 	s.Equal(order.CustomerID, ord.CustomerID)
 }

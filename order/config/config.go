@@ -28,6 +28,10 @@ func GetApplicationPort() int {
 	return port
 }
 
+func GetOTLPEndpoint() string {
+	return getEnvironmentVarible("OTLP_ENDPOINT")
+}
+
 func getEnvironmentVarible(key string) string {
 	val := os.Getenv(key)
 	if val == "" {

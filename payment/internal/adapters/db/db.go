@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -20,6 +21,24 @@ type Payment struct {
 
 type Adapter struct {
 	db *gorm.DB
+}
+
+func NewAdapter(dataSourceUrl string) (*Adapter, error) {
+	db, openErr := gorm.Open(mysql.Open(dataSourceUrl), &gorm.Config{})
+	if openErr != nil {
+		return nil, fmt.Errorf("db connection error %q: %w", dataSourceUrl, openErr)
+	}
+
+	err := db.Use(otelgorm.NewPlugin(otelgorm.WithDBName("order")))
+	if err != nil {
+		return nil, fmt.Errorf("use opentelemetry plugin: %w", err)
+	}
+
+	err = db.AutoMigrate(&Payment{})
+	if err != nil {
+		return nil, fmt.Errorf("db migration error: %v", err)
+	}
+	return &Adapter{db: db}, nil
 }
 
 func (a Adapter) Get(ctx context.Context, id string) (domain.Payment, error) {
@@ -48,17 +67,4 @@ func (a Adapter) Save(ctx context.Context, payment *domain.Payment) error {
 		payment.ID = int64(orderModel.ID)
 	}
 	return res.Error
-}
-
-func NewAdapter(dataSourceUrl string) (*Adapter, error) {
-	db, openErr := gorm.Open(mysql.Open(dataSourceUrl), &gorm.Config{})
-	if openErr != nil {
-		return nil, fmt.Errorf("db connection error %q: %w", dataSourceUrl, openErr)
-	}
-
-	err := db.AutoMigrate(&Payment{})
-	if err != nil {
-		return nil, fmt.Errorf("db migration error: %v", err)
-	}
-	return &Adapter{db: db}, nil
 }

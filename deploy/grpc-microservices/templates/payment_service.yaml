@@ -48,6 +48,8 @@ spec:
             value: {{ .Values.service.paymentPort | quote }}
           - name: DATA_SOURCE_URL
             value: "payment_service:verysecretpass@tcp({{ .Release.Name }}-mysql:3306)/payment_service?charset=utf8mb4&parseTime=True&loc=Local"
+          - name: OTLP_ENDPOINT
+            value: "jaeger-open-search-telemetry-collector:4317"
         ports:
           - containerPort: {{ .Values.service.paymentPort }}
         readinessProbe:

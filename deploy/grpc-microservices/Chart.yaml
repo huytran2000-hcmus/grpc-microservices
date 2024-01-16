@@ -29,12 +29,12 @@ dependencies:
   - name: mysql
     version: 9.14.4
     repository: https://charts.bitnami.com/bitnami
-  - name: cert-manager
-    version: v1.13.2
-    repository: https://charts.jetstack.io
-    condition: cert-manager.enabled
-    tags:
-      - tls
+      #- name: cert-manager
+      #  version: v1.13.2
+      #  repository: https://charts.jetstack.io
+      #  condition: cert-manager.enabled
+      #  tags:
+      #    - tls
   - name: fluent-bit
     version: "^0.42.0"
     repository: https://fluent.github.io/helm-charts
@@ -44,3 +44,6 @@ dependencies:
   - name: opensearch-dashboards
     version: "~2.15.1"
     repository: https://opensearch-project.github.io/helm-charts
+  - name: jaeger-operator
+    version: 2.49.0
+    repository: https://jaegertracing.github.io/helm-charts

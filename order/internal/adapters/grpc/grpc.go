@@ -27,6 +27,7 @@ func (a Adapter) Get(ctx context.Context, request *order.GetOrderRequest) (*orde
 	if err != nil {
 		return nil, err
 	}
+
 	return &order.GetOrderResponse{UserId: result.CustomerID, OrderItems: orderItems}, nil
 }
 
@@ -41,7 +42,7 @@ func (a *Adapter) Create(ctx context.Context, request *order.CreateOrderRequest)
 	}
 
 	newOrder := domain.NewOrder(request.UserId, orderItems)
-	res, err := a.api.PlaceOrder(newOrder)
+	res, err := a.api.PlaceOrder(ctx, newOrder)
 	if err != nil {
 		return nil, makeStatusFromErr("payment", err).Err()
 	}

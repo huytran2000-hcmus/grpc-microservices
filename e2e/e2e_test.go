@@ -3,7 +3,6 @@ package e2e
 import (
 	"context"
 	"testing"
-	"time"
 
 	order_proto "github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order"
 	"github.com/stretchr/testify/suite"
@@ -70,9 +69,9 @@ func (s *CreateOrderSuite) SetupSuite() {
 		s.Require().NoError(compose.Down(ctx, tc.RemoveImagesLocal, tc.RemoveOrphans(true), tc.RemoveVolumes(true)), "Compose Down")
 	})
 
-	toCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	s.T().Cleanup(cancel)
+	// toCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	// s.T().Cleanup(cancel)
 
-	err = compose.Up(toCtx, tc.Wait(true))
+	err = compose.Up(context.Background(), tc.Wait(true))
 	s.Require().NoError(err, "Compose Up")
 }

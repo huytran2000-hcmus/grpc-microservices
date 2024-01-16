@@ -1,0 +1,25 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger-open-search-telemetry
+  namespace: {{ .Release.Namespace}}
+  labels:
+    {{- include "grpc-microservices.labels" . | nindent 4}}
+spec:
+  strategy: production
+  collector:
+    maxReplicas: 5
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: https://opensearch-cluster-master:9200
+        tls:
+          enabled: true
+          skip-host-verify: true
+    secretName: jaeger-secret
+  query:
+    base-path: "/_jaegars"
+  ingress:
+    enabled: false
+

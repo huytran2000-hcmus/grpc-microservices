@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -17,7 +18,10 @@ type Adapter struct {
 
 func NewAdapter(paymentServiceURL string) (*Adapter, error) {
 	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	opts = append(opts,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+	)
 	conn, err := grpc.Dial(paymentServiceURL, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("dial to payment service: %w", err)
@@ -29,8 +33,8 @@ func NewAdapter(paymentServiceURL string) (*Adapter, error) {
 	}, nil
 }
 
-func (a *Adapter) Charge(order *domain.Order) error {
-	_, err := a.payment.Create(context.Background(), &payment.CreatePaymentRequest{
+func (a *Adapter) Charge(ctx context.Context, order *domain.Order) error {
+	_, err := a.payment.Create(ctx, &payment.CreatePaymentRequest{
 		UserId:     order.CustomerID,
 		OrderId:    order.ID,
 		TotalPrice: order.TotalPrice(),

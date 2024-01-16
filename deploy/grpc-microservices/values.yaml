@@ -15,7 +15,7 @@ mysql:
     rootPassword: "verysecretpassword"
   initdbScriptsConfigMap: mysql-initdb-config
 
-tags:
+ingress:
   tls: true
 
 cert-manager:
@@ -53,3 +53,6 @@ fluent-bit:
           HTTP_Passwd admin
           tls On
           tls.verify Off
+
+opensearch:
+  replicas: 1

@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -14,13 +15,15 @@ import (
 
 func TestPlaceOrder(t *testing.T) {
 	payment := ports.NewMockPaymentPort(t)
-	payment.EXPECT().Charge(mock.Anything).Return(nil)
+	payment.EXPECT().Charge(mock.Anything, mock.Anything).Return(nil)
 
 	db := ports.NewMockDBPort(t)
-	db.EXPECT().Save(mock.Anything).Return(nil)
+	db.EXPECT().Save(mock.Anything, mock.Anything).Return(nil)
 
 	app := api.NewApplication(db, payment)
-	_, err := app.PlaceOrder(domain.Order{
+
+	ctx := context.Background()
+	_, err := app.PlaceOrder(ctx, domain.Order{
 		CustomerID: 1,
 		Status:     "Pending",
 		OrderItems: []domain.OrderItem{
@@ -41,13 +44,15 @@ func TestReturnStatusWhenPaymentFailed(t *testing.T) {
 	errMess := "insufficent balance"
 	failedErr := errors.New(errMess)
 	payment := ports.NewMockPaymentPort(t)
-	payment.EXPECT().Charge(mock.Anything).Return(failedErr)
+	payment.EXPECT().Charge(mock.Anything, mock.Anything).Return(failedErr)
 
 	db := ports.NewMockDBPort(t)
-	db.EXPECT().Save(mock.Anything).Return(nil)
+	db.EXPECT().Save(mock.Anything, mock.Anything).Return(nil)
 
 	app := api.NewApplication(db, payment)
-	_, err := app.PlaceOrder(domain.NewOrder(userID, []domain.OrderItem{
+
+	ctx := context.Background()
+	_, err := app.PlaceOrder(ctx, domain.NewOrder(userID, []domain.OrderItem{
 		{
 			ProductCode: "camera",
 			UnitPrice:   12.3,

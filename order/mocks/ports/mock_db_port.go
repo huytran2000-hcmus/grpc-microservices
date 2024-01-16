@@ -3,6 +3,8 @@
 package ports
 
 import (
+	context "context"
+
 	domain "github.com/huytran2000-hcmus/grpc-microservices/order/internal/appication/core/domain"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -20,9 +22,9 @@ func (_m *MockDBPort) EXPECT() *MockDBPort_Expecter {
 	return &MockDBPort_Expecter{mock: &_m.Mock}
 }
 
-// Get provides a mock function with given fields: id
-func (_m *MockDBPort) Get(id int64) (domain.Order, error) {
-	ret := _m.Called(id)
+// Get provides a mock function with given fields: ctx, id
+func (_m *MockDBPort) Get(ctx context.Context, id int64) (domain.Order, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -30,17 +32,17 @@ func (_m *MockDBPort) Get(id int64) (domain.Order, error) {
 
 	var r0 domain.Order
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64) (domain.Order, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (domain.Order, error)); ok {
+		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(int64) domain.Order); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Order); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Get(0).(domain.Order)
 	}
 
-	if rf, ok := ret.Get(1).(func(int64) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -54,14 +56,15 @@ type MockDBPort_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
+//   - ctx context.Context
 //   - id int64
-func (_e *MockDBPort_Expecter) Get(id interface{}) *MockDBPort_Get_Call {
-	return &MockDBPort_Get_Call{Call: _e.mock.On("Get", id)}
+func (_e *MockDBPort_Expecter) Get(ctx interface{}, id interface{}) *MockDBPort_Get_Call {
+	return &MockDBPort_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
-func (_c *MockDBPort_Get_Call) Run(run func(id int64)) *MockDBPort_Get_Call {
+func (_c *MockDBPort_Get_Call) Run(run func(ctx context.Context, id int64)) *MockDBPort_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(int64))
+		run(args[0].(context.Context), args[1].(int64))
 	})
 	return _c
 }
@@ -71,22 +74,22 @@ func (_c *MockDBPort_Get_Call) Return(_a0 domain.Order, _a1 error) *MockDBPort_G
 	return _c
 }
 
-func (_c *MockDBPort_Get_Call) RunAndReturn(run func(int64) (domain.Order, error)) *MockDBPort_Get_Call {
+func (_c *MockDBPort_Get_Call) RunAndReturn(run func(context.Context, int64) (domain.Order, error)) *MockDBPort_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Save provides a mock function with given fields: _a0
-func (_m *MockDBPort) Save(_a0 *domain.Order) error {
-	ret := _m.Called(_a0)
+// Save provides a mock function with given fields: ctx, order
+func (_m *MockDBPort) Save(ctx context.Context, order *domain.Order) error {
+	ret := _m.Called(ctx, order)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Save")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*domain.Order) error); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, *domain.Order) error); ok {
+		r0 = rf(ctx, order)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -100,14 +103,15 @@ type MockDBPort_Save_Call struct {
 }
 
 // Save is a helper method to define mock.On call
-//   - _a0 *domain.Order
-func (_e *MockDBPort_Expecter) Save(_a0 interface{}) *MockDBPort_Save_Call {
-	return &MockDBPort_Save_Call{Call: _e.mock.On("Save", _a0)}
+//   - ctx context.Context
+//   - order *domain.Order
+func (_e *MockDBPort_Expecter) Save(ctx interface{}, order interface{}) *MockDBPort_Save_Call {
+	return &MockDBPort_Save_Call{Call: _e.mock.On("Save", ctx, order)}
 }
 
-func (_c *MockDBPort_Save_Call) Run(run func(_a0 *domain.Order)) *MockDBPort_Save_Call {
+func (_c *MockDBPort_Save_Call) Run(run func(ctx context.Context, order *domain.Order)) *MockDBPort_Save_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*domain.Order))
+		run(args[0].(context.Context), args[1].(*domain.Order))
 	})
 	return _c
 }
@@ -117,7 +121,7 @@ func (_c *MockDBPort_Save_Call) Return(_a0 error) *MockDBPort_Save_Call {
 	return _c
 }
 
-func (_c *MockDBPort_Save_Call) RunAndReturn(run func(*domain.Order) error) *MockDBPort_Save_Call {
+func (_c *MockDBPort_Save_Call) RunAndReturn(run func(context.Context, *domain.Order) error) *MockDBPort_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }
