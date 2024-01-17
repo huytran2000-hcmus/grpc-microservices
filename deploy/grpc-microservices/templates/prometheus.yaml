@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: {{ .Release.Namespace}}
+  labels: 
+    name: prometheus
+    {{- include "grpc-microservices.labels" . | nindent 4}}
+spec:
+  replicas: {{ .Values.replicaCount.order }}
+  selector:
+    matchLabels:
+      service: prometheus
+  template:
+    metadata:
+      labels: 
+        service: prometheus
+        {{- include "grpc-microservices.labels" . | nindent 8}}
+    spec:
+      initContainers:
+        {{- include "initContainer.mysqlWait" . | nindent 6 }}
+      containers:
+      - name: prometheus
+        image: "prom/prometheus:2.49.1"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.prometheusPort }}
+        volumeMounts:
+        - name: prometheus-config-vol
+          mountPath: /etc/prometheus
+        - name: prometheus-data-vol
+          mountPath: /etc/prometheus
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.prometheusPort }}
+          initialDelaySeconds: 1
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.prometheusPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+        - name: prometheus-config-vol
+          configMap:
+            name: prometheus-config
+        - name: prometheus-data-vol
+          persistentVolumeClaim:
+            claimName: prometheus-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+

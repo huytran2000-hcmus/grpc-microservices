@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: {{ .Release.Namespace}}
+  labels:
+    service: order
+    {{- include "grpc-microservices.labels" . | nindent 4}}
+spec:
+  selector:
+    service: order
+  ports:
+    - name: grpc
+      port: {{ .Values.service.orderPort }}
+      protocol: TCP
+      targetPort: {{ .Values.service.orderPort }}
+      appProtocol: grpc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: {{ .Release.Namespace}}
+  labels:
+    service: payment
+    {{- include "grpc-microservices.labels" . | nindent 4}}
+spec:
+  selector:
+    service: payment
+  ports:
+    - name: grpc
+      port: {{ .Values.service.paymentPort }}
+      protocol: TCP
+      targetPort: {{ .Values.service.paymentPort }}
+      appProtocol: grpc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: {{ .Release.Namespace}}
+  labels:
+    service: prometheus
+    {{- include "grpc-microservices.labels" . | nindent 4}}
+spec:
+  selector:
+    service: prometheus
+  ports:
+    - name: prometheus
+      protocol: TCP
+      port: {{ .Values.service.prometheusPort }}
+      targetPort: {{ .Values.service.prometheusPort }}
+      appProtocol: http

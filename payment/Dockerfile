@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
-ARG GO_VERSION=1.21.3
+ARG GO_VERSION=1.21.5
 ARG GOLANGCI_LINT_VERSION=v1.55
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine as build
 WORKDIR /src
 
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.23 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-#     chmod +x /bin/grpc_health_probe
+RUN GRPC_HEALTH_PROBE_VERSION=v0.4.23 && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    chmod +x /bin/grpc_health_probe
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.mod,target=go.mod \

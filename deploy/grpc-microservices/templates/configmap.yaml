@@ -16,3 +16,23 @@ data:
     GRANT ALL PRIVILEGES ON order_service.* TO 'order_service'@'%';
     GRANT ALL PRIVILEGES ON payment_service.* TO 'payment_service'@'%';
 immutable: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: {{ .Release.Namespace}}
+  labels:
+    {{- include "grpc-microservices.labels" . | nindent 4}}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    scrape_configs:
+      - job_name: order-service
+        static_congigs:
+          - targets: [ 'order:{{ include Values.service.servicePort }}']
+      - job_name: payment-service
+        static_congigs:
+          - targets: [ 'payment:{{ include Values.service.servicePort }}']

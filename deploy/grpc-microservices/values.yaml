@@ -9,6 +9,7 @@ image:
 service:
   orderPort: "8080"
   paymentPort: "8081"
+  prometheusPort: "9090"
 
 mysql:
   auth:

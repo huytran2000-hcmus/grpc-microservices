@@ -7,14 +7,14 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	"github.com/huytran2000-hcmus/grpc-microservices/instrumentation/metric"
+	"github.com/huytran2000-hcmus/grpc-microservices/instrumentation/trace"
 	"go.uber.org/zap"
 
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/config"
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/adapters/db"
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/adapters/grpc"
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/application/core/api"
-	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/instrumentation"
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/logger"
 )
 
@@ -30,15 +30,21 @@ func main() {
 	}
 	zap.ReplaceGlobals(logger)
 
-	otelLogger := instrumentation.WrapOtelLogger(logger)
-	otelzap.ReplaceGlobals(otelLogger)
-
-	otelShutdown, err := instrumentation.SetupOtelSDK(context.Background(), serviceName, serviceVersion, config.GetOTLPEndpoint())
+	otelTraceShutdown, err := trace.SetupOtelSDK(context.Background(), serviceName, serviceVersion, config.GetOTLPEndpoint())
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("setup opentelemetry: %s", err))
+		logger.Fatal(fmt.Sprintf("setup trace sdk: %s", err))
 	}
 	defer func() {
-		err := otelShutdown(context.Background())
+		err := otelTraceShutdown(context.Background())
+		logger.Fatal(err.Error())
+	}()
+
+	otelMetricShutdown, err := metric.SetupOtelSDK(context.Background(), serviceName, serviceVersion)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("setup metric sdk: %s", err))
+	}
+	defer func() {
+		err := otelMetricShutdown(context.Background())
 		logger.Fatal(err.Error())
 	}()
 

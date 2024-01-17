@@ -1,19 +1,18 @@
-package instrumentation
+package trace
 
 import (
 	"context"
 	"errors"
 	"time"
 
-	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
-	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials/insecure"
+
+	rsc "github.com/huytran2000-hcmus/grpc-microservices/instrumentation/internal/resource"
 )
 
 func SetupOtelSDK(ctx context.Context, serviceName, serviceVersion string, otlpEndpoint string) (shutdown func(context.Context) error, err error) {
@@ -36,14 +35,7 @@ func SetupOtelSDK(ctx context.Context, serviceName, serviceVersion string, otlpE
 		}
 	}()
 
-	res, err := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceName(serviceName),
-			semconv.ServiceVersion(serviceVersion),
-		),
-	)
+	res, err := rsc.NewResource(serviceName, serviceVersion)
 	if err != nil {
 		return shutdown, err
 	}
@@ -62,10 +54,6 @@ func SetupOtelSDK(ctx context.Context, serviceName, serviceVersion string, otlpE
 	otel.SetTracerProvider(traceProvider)
 
 	return shutdown, nil
-}
-
-func WrapOtelLogger(logger *zap.Logger) *otelzap.Logger {
-	return otelzap.New(logger)
 }
 
 func newTraceProvider(res *resource.Resource, otlpEndpoint string) (*trace.TracerProvider, error) {
