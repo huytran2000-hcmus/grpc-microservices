@@ -194,6 +194,8 @@ github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.1.0 h1:Nyl
 github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order v0.1.0/go.mod h1:TCNuhCq88b9UrgYIZeXjy/jMTHCPIOMYlkt7qtid67A=
 github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment v0.2.1 h1:jkpzz9w+ahoFfDMYpKTEimw7Qrn9rY20fXwmSgKDYHM=
 github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment v0.2.1/go.mod h1:lS+mFIJBEZs0CF7T+zGCM0OS57hWy56dtF2JcugZEwc=
+github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.0 h1:XqGIu2yapoAtJNX7EWvHK7yJZgAfharnBigLCyIM6xU=
+github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.0/go.mod h1:XbkLh3AWx9t5HW3JKbOMqY++uur8anVQSQswQweLg30=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=

@@ -32,14 +32,16 @@ func main() {
 	}
 	zap.ReplaceGlobals(logger)
 
-	otelShutdown, err := trace.SetupOtelSDK(context.Background(), serviceName, serviceVersion, config.GetOTLPEndpoint())
-	if err != nil {
-		log.Fatalf("setup opentelemetry: %s", err)
+	if config.GetOTLPEndpoint() != "" {
+		otelShutdown, err := trace.SetupOtelSDK(context.Background(), serviceName, serviceVersion, config.GetOTLPEndpoint())
+		if err != nil {
+			log.Fatalf("setup opentelemetry: %s", err)
+		}
+		defer func() {
+			err := otelShutdown(context.Background())
+			log.Fatal(err)
+		}()
 	}
-	defer func() {
-		err := otelShutdown(context.Background())
-		log.Fatal(err)
-	}()
 
 	otelMetricShutdown, err := metric.SetupOtelSDK(context.Background(), serviceName, serviceVersion)
 	if err != nil {

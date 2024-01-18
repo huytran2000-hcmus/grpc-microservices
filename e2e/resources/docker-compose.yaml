@@ -20,6 +20,7 @@ services:
       APPLICATION_PORT: 3001
       ENV: "development"
       DATA_SOURCE_URL: "payment_service:verysecretpass@tcp(mysql:3306)/payment_service?charset=utf8mb4&parseTime=True&loc=Local"
+      OTLP_ENDPOINT: localhost:4317
     depends_on:
       mysql:
         condition: service_healthy
@@ -37,6 +38,7 @@ services:
       ENV: "development"
       DATA_SOURCE_URL: "order_service:verysecretpass@tcp(mysql:3306)/order_service?charset=utf8mb4&parseTime=True&loc=Local"
       PAYMENT_SERVICE_URL: "payment:3001"
+      OTLP_ENDPOINT: localhost:4317
     depends_on:
       mysql:
         condition: service_healthy

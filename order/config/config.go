@@ -34,9 +34,6 @@ func GetOTLPEndpoint() string {
 
 func getEnvironmentVarible(key string) string {
 	val := os.Getenv(key)
-	if val == "" {
-		log.Fatalf("%s environment varible is missing", key)
-	}
 
 	return val
 }

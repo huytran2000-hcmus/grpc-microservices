@@ -35,7 +35,7 @@ func SetupOtelSDK(ctx context.Context, serviceName, serviceVersion string, otlpE
 		}
 	}()
 
-	res, err := rsc.NewResource(serviceName, serviceVersion)
+	res, err := rsc.New(serviceName, serviceVersion)
 	if err != nil {
 		return shutdown, err
 	}

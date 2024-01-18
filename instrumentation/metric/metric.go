@@ -31,7 +31,7 @@ func SetupOtelSDK(ctx context.Context, serviceName, serviceVersion string) (shut
 		}
 	}()
 
-	res, err := resource.NewResource(serviceName, serviceVersion)
+	res, err := resource.New(serviceName, serviceVersion)
 	if err != nil {
 		return nil, err
 	}

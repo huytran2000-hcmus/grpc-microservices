@@ -19,7 +19,7 @@ spec:
           skip-host-verify: true
     secretName: jaeger-secret
   query:
-    base-path: "/_jaegars"
+    # base-path: "/_jaegars"
   ingress:
     enabled: false
 
