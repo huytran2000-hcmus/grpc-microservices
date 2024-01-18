@@ -24,6 +24,10 @@ payment:
 	OTLP_ENDPOINT=${OTLP_ENDPOINT} \
 	go run cmd/main.go
 
+.PHONY: docker-compose
+docker-compose:
+	cd e2e/resources; docker-compose up
+
 .PHONY: mock
 mock:
 	cd order; mockery

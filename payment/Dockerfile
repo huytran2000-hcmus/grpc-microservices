@@ -28,5 +28,5 @@ RUN --mount=type=bind,target=. \
 
 from scratch
 COPY --from=build /bin/payment /bin/
-# COPY --from=build /bin/grpc_health_probe /bin/
+COPY --from=build /bin/grpc_health_probe /bin/
 ENTRYPOINT [ "/bin/payment" ]
