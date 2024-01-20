@@ -13,6 +13,7 @@ order:
 	APPLICATION_PORT=3000 \
 	ENV=development \
 	PAYMENT_SERVICE_URL=localhost:3001 \
+	METRIC_ADDRESS=:9090 \
 	OTLP_ENDPOINT=${OTLP_ENDPOINT} \
 	go run cmd/main.go
 
@@ -22,6 +23,7 @@ payment:
 	APPLICATION_PORT=3001 \
 	ENV=development \
 	OTLP_ENDPOINT=${OTLP_ENDPOINT} \
+	METRIC_ADDRESS=:9090 \
 	go run cmd/main.go
 
 .PHONY: docker-compose
@@ -59,8 +61,8 @@ helm-install:
 	minikube tunnel
 
 helm-uninstall:
-	helm uninstall grpc-microservices
 	kubectl delete secret jaeger-secret
+	helm uninstall grpc-microservices
 
 helm-upgrade:
 	helm upgrade grpc-microservices deploy/grpc-microservices/

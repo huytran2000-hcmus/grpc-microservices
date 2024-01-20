@@ -10,6 +10,7 @@ service:
   orderPort: "8080"
   paymentPort: "8081"
   prometheusPort: "9090"
+  metricPort: "9000"
 
 mysql:
   auth:

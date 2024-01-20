@@ -32,6 +32,10 @@ func GetOTLPEndpoint() string {
 	return getEnvironmentVarible("OTLP_ENDPOINT")
 }
 
+func GetMetricAddress() string {
+	return getEnvironmentVarible("METRIC_ADDRESS")
+}
+
 func getEnvironmentVarible(key string) string {
 	val := os.Getenv(key)
 

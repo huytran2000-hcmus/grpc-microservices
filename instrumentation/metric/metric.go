@@ -36,9 +36,7 @@ func SetupOtelSDK(ctx context.Context, serviceName, serviceVersion string) (shut
 		return nil, err
 	}
 
-	exporter, err := prometheus.New(
-		prometheus.WithNamespace(serviceName),
-	)
+	exporter, err := prometheus.New()
 	if err != nil {
 		return nil, err
 	}

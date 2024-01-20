@@ -27,12 +27,30 @@ metadata:
 data:
   prometheus.yml: |
     global:
-      scrape_interval: 15s
+      scrape_interval: 5s
       evaluation_interval: 15s
+    rule_files:
+      - prometheus.rules.yml
     scrape_configs:
-      - job_name: order-service
-        static_congigs:
-          - targets: [ 'order:{{ include Values.service.servicePort }}']
-      - job_name: payment-service
-        static_congigs:
-          - targets: [ 'payment:{{ include Values.service.servicePort }}']
+      - job_name: microservices
+        static_configs:
+          - targets: [ 'order-metrics:{{ .Values.service.metricPort }}']
+            labels:
+              service: 'order'
+          - targets: [ 'payment-metrics:{{ .Values.service.metricPort }}']
+            labels:
+              service: 'payment'
+  prometheus.rules.yml: |
+    groups:
+    - name: RED
+      rules:
+        - record: microservices:red:request_inbound_rate
+          expr: sum(rate(rpc_server_requests_per_rpc_count[10s])) by (service)
+        - record: microservices:red:invalid_argument_error_rate
+          expr: sum(rate(rpc_server_responses_per_rpc_count{rpc_grpc_status_code="3"}[10s])) by (service)
+        - record: microservices:red:internal_argument_error_rate
+          expr: sum(rate(rpc_server_responses_per_rpc_count{rpc_grpc_status_code="13"}[10s])) by (service)
+        - record: microservices:red:unknown_argument_error_rate
+          expr: sum(rate(rpc_server_responses_per_rpc_count{rpc_grpc_status_code="2"}[10s])) by (service)
+        - record: microservices:red:two_nine_tile_millisecond_duration
+          expr: histogram_quantile(0.99, sum(rpc_server_duration_milliseconds_bucket) by (service, le))

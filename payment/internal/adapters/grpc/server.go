@@ -46,7 +46,7 @@ func NewAdapter(api ports.APIPort, port int) *Adapter {
 	return &Adapter{api: api, port: port}
 }
 
-func (a Adapter) Run() {
+func (a *Adapter) Run() {
 	var err error
 
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
@@ -111,75 +111,86 @@ func (a Adapter) Run() {
 		reflection.Register(grpcSrv)
 	}
 
-	zap.L().Info(fmt.Sprintf("starting payment service on port %d ...", a.port))
+	zap.L().Info(fmt.Sprintf("starting payment grpc server on port %d ...", a.port))
 
 	shutdown := make(chan struct{}, 1)
 	done := make(chan struct{}, 1)
 	go func() {
-		runPrometheusServer(shutdown)
+		runPrometheusServer(config.GetMetricAddress(), shutdown)
 		done <- struct{}{}
 	}()
 	err = grpcSrv.Serve(listen)
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("failed to serve grpc on port %d", a.port))
+		zap.L().Error(fmt.Sprintf("failed to serve grpc on port %d", a.port))
 	}
+
+	shutdown <- struct{}{}
 
 	<-done
 }
 
-func (a Adapter) Shutdown() {
+func (a *Adapter) Shutdown() {
+	zap.L().Info("stopping payment grpc server...")
 	a.server.GracefulStop()
 }
 
-func runPrometheusServer(shutdownCh <-chan struct{}) {
+func runPrometheusServer(addr string, shutdownCh <-chan struct{}) {
 	mux := http.NewServeMux()
-	mux.Handle("metrics", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.Handler())
 	srv := http.Server{
 		Handler: mux,
+		Addr:    addr,
 	}
 
-	errCh := make(chan error)
+	errCh := make(chan error, 1)
 	var err error
+
+	go func() {
+		zap.L().Info(fmt.Sprintf("starting payment http server on address %s ...", addr))
+		err = srv.ListenAndServe()
+		errCh <- err
+	}()
+
 	select {
-	case errCh <- srv.ListenAndServe():
-		err = <-errCh
 	case <-shutdownCh:
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
+		zap.L().Info("stopping payment http server...")
 		err = srv.Shutdown(ctx)
-	}
-	if err != nil {
+		if err != nil {
+			zap.L().Error(err.Error())
+		}
+	case err := <-errCh:
 		zap.L().Error(err.Error())
 	}
 }
 
 func otelZapUnaryInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-	span := trace.SpanFromContext(ctx)
-	sCTX := span.SpanContext()
-	ctxzap.AddFields(ctx, zap.String("trace.id", sCTX.TraceID().String()))
-	ctxzap.AddFields(ctx, zap.String("span.id", sCTX.SpanID().String()))
-
-	peer, ok := peer.FromContext(ctx)
-	if ok {
-		ctxzap.AddFields(ctx, zap.String("peer.address", peer.Addr.String()))
-	}
+	addTraceField(ctx)
 
 	return handler(ctx, req)
 }
 
 func otelZapStreamInterceptor(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	ctx := ss.Context()
+	addTraceField(ctx)
+
+	return handler(ctx, ss)
+}
+
+func addTraceField(ctx context.Context) {
 	span := trace.SpanFromContext(ctx)
-	sCTX := span.SpanContext()
-	ctxzap.AddFields(ctx, zap.String("trace.id", sCTX.TraceID().String()))
-	ctxzap.AddFields(ctx, zap.String("span.id", sCTX.SpanID().String()))
+	if span.IsRecording() {
+		sCTX := span.SpanContext()
+		ctxzap.AddFields(ctx, zap.String("trace.id", sCTX.TraceID().String()))
+		ctxzap.AddFields(ctx, zap.String("span.id", sCTX.SpanID().String()))
+
+	}
 
 	peer, ok := peer.FromContext(ctx)
 	if ok {
 		ctxzap.AddFields(ctx, zap.String("peer.address", peer.Addr.String()))
 	}
-
-	return handler(ctx, ss)
 }
 
 func traceExamplar(ctx context.Context) prometheus.Labels {

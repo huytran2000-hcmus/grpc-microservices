@@ -48,8 +48,10 @@ func main() {
 		logger.Fatal(fmt.Sprintf("setup metric sdk: %s", err))
 	}
 	defer func() {
-		err := otelMetricShutdown(context.Background())
-		logger.Fatal(err.Error())
+		err = otelMetricShutdown(context.Background())
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
 	}()
 
 	dbAdapter, err := db.NewAdapter(config.GetDataSourceURL())
@@ -75,7 +77,7 @@ func setupGracefulShutdown(shutdownServer func()) {
 		signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 
 		s := <-quit
-		zap.L().Info(fmt.Sprintf("Receive signal %s", s.String()))
+		zap.L().Info(fmt.Sprintf("receive signal %s", s.String()))
 		shutdownServer()
 	}()
 }
