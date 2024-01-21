@@ -6,6 +6,10 @@ import (
 	"strconv"
 )
 
+const (
+	DevelopmentEnv = "development"
+)
+
 func GetEnv() string {
 	return getEnvironmentValue("ENV")
 }

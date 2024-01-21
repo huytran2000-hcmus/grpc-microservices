@@ -198,6 +198,8 @@ github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.0 h1:XqGIu2
 github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.0/go.mod h1:XbkLh3AWx9t5HW3JKbOMqY++uur8anVQSQswQweLg30=
 github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.1 h1:ShwhNlkEc5eSEYwWDeinhwEj87IOaMCXrBciLM8Psvc=
 github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.1/go.mod h1:SXbCGytvj9LS9IFGihkArCEo38OrfVAYTS1vBpKBVoE=
+github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.2.0 h1:Cx+7mCT2ZK08dRzhcwoX4a5n97i+rFhx0ZHZuSTrMSo=
+github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.2.0/go.mod h1:SXbCGytvj9LS9IFGihkArCEo38OrfVAYTS1vBpKBVoE=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=

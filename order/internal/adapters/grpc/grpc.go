@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -12,7 +13,10 @@ import (
 	"github.com/huytran2000-hcmus/grpc-microservices/order/internal/appication/core/domain"
 )
 
-var _ order.OrderServer = (*Adapter)(nil)
+var (
+	_    order.OrderServer = (*Adapter)(nil)
+	once                   = &sync.Once{}
+)
 
 func (a Adapter) Get(ctx context.Context, request *order.GetOrderRequest) (*order.GetOrderResponse, error) {
 	result, err := a.api.GetOrder(ctx, request.OrderId)
@@ -32,6 +36,9 @@ func (a Adapter) Get(ctx context.Context, request *order.GetOrderRequest) (*orde
 }
 
 func (a *Adapter) Create(ctx context.Context, request *order.CreateOrderRequest) (*order.CreateOrderResponse, error) {
+	once.Do(func() {
+		panic("test panic recovery")
+	})
 	var orderItems []domain.OrderItem
 	for _, oItem := range request.OrderItems {
 		orderItems = append(orderItems, domain.OrderItem{

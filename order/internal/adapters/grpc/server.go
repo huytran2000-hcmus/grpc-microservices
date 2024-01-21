@@ -14,9 +14,10 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/order"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -31,9 +32,7 @@ import (
 	"github.com/huytran2000-hcmus/grpc-microservices/order/internal/ports"
 )
 
-const (
-	serverName = "order"
-)
+var meter = otel.Meter("order_grpc")
 
 type Adapter struct {
 	api    ports.APIPort
@@ -47,10 +46,12 @@ func NewAdapter(api ports.APIPort, port int) *Adapter {
 }
 
 func (a *Adapter) Run() {
+	logger := zap.L()
+
 	var err error
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("failed to listen on port %d, error: %v", a.port, err))
+		logger.Fatal(fmt.Sprintf("failed to listen on port %d, error: %v", a.port, err))
 	}
 	zapOpts := []grpc_zap.Option{
 		grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
@@ -65,22 +66,26 @@ func (a *Adapter) Run() {
 	srvMetric := grpcprom.NewServerMetrics()
 	prometheus.MustRegister(srvMetric)
 	// Setup metric for panic recoveries.
-	panicsTotal := promauto.NewCounter(prometheus.CounterOpts{
-		Name: "grpc_req_panics_recovered_total",
-		Help: "Total number of gRPC requests recovered from internal panic.",
-	})
+
+	panicsTotalName := "grpc_req_panics_recovered_count"
+	panicsTotal, err := meter.Int64Counter(panicsTotalName,
+		metric.WithDescription("Total number of gRPC requests recovered from internal panic."),
+		metric.WithUnit("{count}"),
+	)
+	if err != nil {
+		logger.Error(fmt.Sprintf("create %s meter: %v", panicsTotalName, err))
+	}
 	grpcPanicRecoveryHandler := func(p any) (err error) {
-		panicsTotal.Inc()
+		panicsTotal.Add(context.Background(), 1)
 		// level.Error(rpcLogger).Log("msg", "recovered from panic", "panic", p, "stack", debug.Stack())
 		return status.Errorf(codes.Internal, "%s", p)
 	}
 
-	lgr := zap.L().Named(serverName)
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				recovery.UnaryServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler)),
-				grpc_zap.UnaryServerInterceptor(lgr, zapOpts...),
+				grpc_zap.UnaryServerInterceptor(logger, zapOpts...),
 				otelZapUnaryInterceptor, // This must go after the grpc_zap interceptor
 				srvMetric.UnaryServerInterceptor(grpcprom.WithExemplarFromContext(traceExamplar)),
 			),
@@ -88,7 +93,7 @@ func (a *Adapter) Run() {
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
 				recovery.StreamServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler)),
-				grpc_zap.StreamServerInterceptor(lgr, zapOpts...),
+				grpc_zap.StreamServerInterceptor(logger, zapOpts...),
 				otelZapStreamInterceptor, // This must go after the grpc_zap interceptor
 				srvMetric.StreamServerInterceptor(grpcprom.WithExemplarFromContext(traceExamplar)),
 			),
@@ -108,7 +113,7 @@ func (a *Adapter) Run() {
 		reflection.Register(grpcSrv)
 	}
 
-	zap.L().Info(fmt.Sprintf("starting order grpc server on port %d ...", a.port))
+	logger.Info(fmt.Sprintf("starting order grpc server on port %d ...", a.port))
 
 	shutdown := make(chan struct{}, 1)
 	done := make(chan struct{}, 1)
@@ -118,7 +123,7 @@ func (a *Adapter) Run() {
 	}()
 	err = grpcSrv.Serve(listen)
 	if err != nil {
-		zap.L().Error(fmt.Sprintf("serve grpc on port: %d, %s", a.port, err))
+		logger.Error(fmt.Sprintf("serve grpc on port: %d, %s", a.port, err))
 	}
 	shutdown <- struct{}{}
 

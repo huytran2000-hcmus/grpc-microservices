@@ -44,7 +44,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
-	github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.1.1 // indirect
+	github.com/huytran2000-hcmus/grpc-microservices/instrumentation v0.2.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.16.0 // indirect

@@ -10,6 +10,7 @@ import (
 	"github.com/huytran2000-hcmus/grpc-microservices/instrumentation/metric"
 	"github.com/huytran2000-hcmus/grpc-microservices/instrumentation/trace"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/config"
 	"github.com/huytran2000-hcmus/grpc-microservices/payment/internal/adapters/db"
@@ -24,11 +25,11 @@ const (
 )
 
 func main() {
-	logger, err := logger.NewLogger(zap.InfoLevel)
+	logger, err := logger.NewLogger(getLoggerLevel())
 	if err != nil {
 		panic(err)
 	}
-	zap.ReplaceGlobals(logger)
+	zap.ReplaceGlobals(logger.Named(serviceName))
 
 	if config.GetOTLPEndpoint() != "" {
 		otelTraceShutdown, err := trace.SetupOtelSDK(context.Background(), serviceName, serviceVersion, config.GetOTLPEndpoint())
@@ -74,4 +75,12 @@ func setupGracefulShutdown(shutdownServer func()) {
 		zap.L().Info(fmt.Sprintf("receive signal %s", s.String()))
 		shutdownServer()
 	}()
+}
+
+func getLoggerLevel() zapcore.Level {
+	if config.GetEnv() == config.DevelopmentEnv {
+		return zap.DebugLevel
+	}
+
+	return zap.InfoLevel
 }
