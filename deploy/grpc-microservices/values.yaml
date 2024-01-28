@@ -10,7 +10,6 @@ service:
   orderPort: "8080"
   paymentPort: "8081"
   prometheusPort: "9090"
-  metricPort: "9000"
 
 mysql:
   auth:
@@ -58,3 +57,45 @@ fluent-bit:
 
 opensearch:
   replicas: 1
+
+opentelemetry-collector:
+  mode: deployment
+  ports:
+    prometheus:
+      enabled: true
+      containerPort: 9000
+      servicePort: 9000
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+    exporters:
+      debug:
+        verbosity: detailed
+      otlp:
+        endpoint: jaeger-open-search-telemetry-collector:4317
+        tls:
+          insecure: true
+      prometheus:
+        endpoint: 0.0.0.0:9000
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 80
+        spike_limit_percentage: 20
+      batch:
+        send_batch_size: 8102
+        timeout: 200ms
+        send_batch_max_size: 10240
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [debug, otlp]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [debug, prometheus]

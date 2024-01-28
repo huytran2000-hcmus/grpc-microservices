@@ -42,18 +42,18 @@ func main() {
 			err := otelTraceShutdown(context.Background())
 			log.Fatal(err)
 		}()
-	}
 
-	otelMetricShutdown, err := metric.SetupOtelSDK(context.Background(), serviceName, serviceVersion)
-	if err != nil {
-		logger.Fatal(fmt.Sprintf("setup metric sdk: %s", err))
-	}
-	defer func() {
-		err = otelMetricShutdown(context.Background())
+		otelMetricShutdown, err := metric.SetupOtelSDK(context.Background(), serviceName, serviceVersion, config.GetOTLPEndpoint())
 		if err != nil {
-			logger.Fatal(err.Error())
+			logger.Fatal(fmt.Sprintf("setup metric sdk: %s", err))
 		}
-	}()
+		defer func() {
+			err = otelMetricShutdown(context.Background())
+			if err != nil {
+				logger.Fatal(err.Error())
+			}
+		}()
+	}
 
 	dbAdapter, err := db.NewAdapter(config.GetDataSourceURL())
 	if err != nil {

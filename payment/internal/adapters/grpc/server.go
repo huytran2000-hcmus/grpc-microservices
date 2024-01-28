@@ -4,17 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"net/http"
-	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
-	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"github.com/huytran2000-hcmus/grpc-microservices-proto/golang/payment"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
@@ -64,10 +60,6 @@ func (a *Adapter) Run() {
 		}),
 	}
 
-	srvMetric := grpcprom.NewServerMetrics()
-	prometheus.MustRegister(srvMetric)
-	// Setup metric for panic recoveries.
-
 	panicsTotalName := "grpc_req_panics_recovered_count"
 	panicsTotal, err := meter.Int64Counter(panicsTotalName,
 		metric.WithDescription("Total number of gRPC requests recovered from internal panic."),
@@ -88,7 +80,6 @@ func (a *Adapter) Run() {
 				recovery.UnaryServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler)),
 				grpc_zap.UnaryServerInterceptor(logger, zapOpts...),
 				otelZapUnaryInterceptor, // This must go after the grpc_zap interceptor
-				srvMetric.UnaryServerInterceptor(grpcprom.WithExemplarFromContext(traceExamplar)),
 			),
 		),
 
@@ -97,7 +88,6 @@ func (a *Adapter) Run() {
 				recovery.StreamServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler)),
 				grpc_zap.StreamServerInterceptor(logger, zapOpts...),
 				otelZapStreamInterceptor, // This must go after the grpc_zap interceptor
-				srvMetric.StreamServerInterceptor(grpcprom.WithExemplarFromContext(traceExamplar)),
 			),
 		),
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
@@ -117,56 +107,15 @@ func (a *Adapter) Run() {
 
 	logger.Info(fmt.Sprintf("starting payment grpc server on port %d ...", a.port))
 
-	shutdown := make(chan struct{}, 1)
-	done := make(chan struct{}, 1)
-	go func() {
-		runPrometheusServer(config.GetMetricAddress(), shutdown)
-		done <- struct{}{}
-	}()
 	err = grpcSrv.Serve(listen)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to serve grpc on port %d", a.port))
 	}
-
-	shutdown <- struct{}{}
-
-	<-done
 }
 
 func (a *Adapter) Shutdown() {
 	zap.L().Info("stopping payment grpc server...")
 	a.server.GracefulStop()
-}
-
-func runPrometheusServer(addr string, shutdownCh <-chan struct{}) {
-	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.Handler())
-	srv := http.Server{
-		Handler: mux,
-		Addr:    addr,
-	}
-
-	errCh := make(chan error, 1)
-	var err error
-
-	go func() {
-		zap.L().Info(fmt.Sprintf("starting payment http server on address %s ...", addr))
-		err = srv.ListenAndServe()
-		errCh <- err
-	}()
-
-	select {
-	case <-shutdownCh:
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
-		zap.L().Info("stopping payment http server...")
-		err = srv.Shutdown(ctx)
-		if err != nil {
-			zap.L().Error(err.Error())
-		}
-	case err := <-errCh:
-		zap.L().Error(err.Error())
-	}
 }
 
 func otelZapUnaryInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {

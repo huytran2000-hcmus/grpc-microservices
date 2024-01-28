@@ -32,14 +32,11 @@ data:
     rule_files:
       - prometheus.rules.yml
     scrape_configs:
-      - job_name: microservices
+      - job_name: otlp
         static_configs:
-          - targets: [ 'order-metrics:{{ .Values.service.metricPort }}']
+          - targets: [ '{{ .Release.Name }}-opentelemetry-collector:9000']
             labels:
-              service: 'order'
-          - targets: [ 'payment-metrics:{{ .Values.service.metricPort }}']
-            labels:
-              service: 'payment'
+              group: RED
   prometheus.rules.yml: |
     groups:
     - name: RED

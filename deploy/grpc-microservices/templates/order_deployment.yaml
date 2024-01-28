@@ -33,12 +33,9 @@ spec:
         - name: PAYMENT_SERVICE_URL
           value: "payment:{{ .Values.service.paymentPort }}"
         - name: OTLP_ENDPOINT
-          value: "jaeger-open-search-telemetry-collector:4317"
-        - name: METRIC_ADDRESS
-          value: ":{{ .Values.service.metricPort }}"
+          value: "{{ .Release.Name }}-opentelemetry-collector:4317"
         ports:
         - containerPort: {{ .Values.service.orderPort }}
-        - containerPort: {{ .Values.service.metricPort }} 
         readinessProbe:
           grpc:
             port: {{ .Values.service.orderPort }}
